@@ -1,0 +1,4 @@
+{
+  "name": "claude-statusline",
+  "description": "Colorful 3-line statusline with context window, Git info, cost tracking, and rate limits. Configurable via conversational menu with bilingual (中文/English) instructions."
+}
