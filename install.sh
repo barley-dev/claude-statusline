@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 SETTINGS_FILE="$CLAUDE_HOME/settings.json"
 STATUSLINE_FILE="$CLAUDE_HOME/statusline.sh"
