@@ -52,7 +52,14 @@ cmd_get() {
 
 cmd_reset() {
     mkdir -p "$(dirname "$CONFIG_FILE")"
-    echo "$DEFAULT_CONFIG" | jq . > "$CONFIG_FILE"
+    local tmpfile
+    tmpfile=$(mktemp "${CONFIG_FILE}.XXXXXX")
+    if echo "$DEFAULT_CONFIG" | jq . > "$tmpfile"; then
+        mv "$tmpfile" "$CONFIG_FILE"
+    else
+        rm -f "$tmpfile"
+        echo "Failed to write config" >&2; exit 1
+    fi
 }
 
 case "${1:-}" in
