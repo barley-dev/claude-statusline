@@ -1,12 +1,12 @@
 # Claude Code Statusline
 
-> **v1.0.0** · A colorful, informative status bar for Claude Code.
->
-> Claude Code 彩色狀態列——context 用量、費用追蹤、Git 狀態、rate limits，一眼看完。
+**v1.0.0** · A colorful, informative status bar for Claude Code.
+
+[中文版 README](README.zh-TW.md)
 
 Inspired by [YAHA 學堂](https://www.youtube.com/@yaboruei)'s video: [Claude Code 最該裝的不是 Skill，是這個腳本](https://youtu.be/wHRFuTqlpD8?si=-iWSGmMA3w7z40V-)
 
-## Preview / 預覽
+## Preview
 
 ```
 [Opus] my-project (main +2 ~3)
@@ -14,13 +14,13 @@ Inspired by [YAHA 學堂](https://www.youtube.com/@yaboruei)'s video: [Claude Co
 5h: 35% (reset 2h 15m) │ 7d: 62% (reset 3d 5h)
 ```
 
-| 行 | 內容 |
+| Line | Content |
 |---|---|
-| 第一行 | 模型名稱、資料夾名稱、Git 分支（含 staged/modified 檔案數） |
-| 第二行 | 彩色 context 進度條（綠 <70%、黃 70-90%、紅 >90%）、session 費用、經過時間 |
-| 第三行 | 5 小時 / 7 天 rate limit 用量與重置倒數（僅 Pro/Max 用戶） |
+| Line 1 | Model name, folder, Git branch (staged/modified counts) |
+| Line 2 | Color-coded context progress bar (green <70%, yellow 70-90%, red >90%), session cost, elapsed time |
+| Line 3 | 5-hour / 7-day rate limit usage with reset countdown (Pro/Max only) |
 
-## Quick Install / 快速安裝
+## Quick Install
 
 ```bash
 git clone https://github.com/barley-dev/claude-statusline.git
@@ -28,63 +28,63 @@ cd claude-statusline
 ./install.sh
 ```
 
-重啟 Claude Code 即可看到狀態列。
+Restart Claude Code and the statusline appears at the bottom.
 
-## What the Installer Does / 安裝腳本做了什麼
+## What the Installer Does
 
-1. 檢查 `jq` 是否已安裝（必要依賴）
-2. 將 `statusline.sh` 寫入 `~/.claude/statusline.sh`
-3. **安全合併** `statusLine` 設定到 `~/.claude/settings.json`
-   - 修改前自動備份（`settings.json.bak`）
-   - 不覆蓋其他設定——只新增/更新 `statusLine`
-   - 已有 statusLine 設定時會詢問是否覆蓋
-   - 偵測到 JSON 格式錯誤時拒絕寫入
+1. Checks that `jq` is installed (required dependency)
+2. Writes `statusline.sh` to `~/.claude/statusline.sh`
+3. Safely merges `statusLine` config into `~/.claude/settings.json`
+   - Creates backup (`settings.json.bak`) before modifying
+   - Won't overwrite existing config — only adds/updates `statusLine`
+   - Asks before replacing an existing statusline setup
+   - Refuses to touch malformed JSON files
 
-## Uninstall / 反安裝
+## Uninstall
 
 ```bash
 ./uninstall.sh
 ```
 
-移除 `statusline.sh` 並從 `settings.json` 刪除 `statusLine` 設定。其他設定完全不受影響。
+Removes `statusline.sh` and the `statusLine` key from `settings.json`. All other settings are preserved.
 
-## Requirements / 系統需求
+## Requirements
 
 - [Claude Code](https://claude.com/claude-code)
-- [jq](https://jqlang.github.io/jq/) — JSON 處理工具
+- [jq](https://jqlang.github.io/jq/) — JSON processor
   - macOS: `brew install jq`
   - Ubuntu: `sudo apt install jq`
 
-## Features / 功能
+## Features
 
-| 功能 | 說明 |
+| Feature | Description |
 |---|---|
-| Context 進度條 | 10 格進度條，依用量自動變色 |
-| 模型名稱 | 顯示當前模型（Opus、Sonnet 等） |
-| Git 狀態 | 分支名稱、staged (+N) 和 modified (~N) 檔案數 |
-| Session 費用 | 累計美金費用 |
-| 經過時間 | 分鐘與秒 |
-| Rate Limits | 5 小時 / 7 天用量與重置倒數 |
-| 自動適應 | 適用任何模型與 context window 大小 |
-| 安全安裝 | 備份設定、驗證 JSON、不盲目覆蓋 |
+| Context progress bar | 10-block bar, auto-colors by usage level |
+| Model name | Shows current model (Opus, Sonnet, etc.) |
+| Git status | Branch name, staged (+N) and modified (~N) file counts |
+| Session cost | Running total in USD |
+| Elapsed time | Minutes and seconds since session start |
+| Rate limits | 5-hour and 7-day usage with countdown to reset |
+| Adaptive | Works with any model / context window size |
+| Safe install | Backs up settings, validates JSON, never overwrites blindly |
 
-## Running Tests / 執行測試
+## Running Tests
 
 ```bash
-# 功能測試（33 個）
+# Statusline functionality tests (33 tests)
 ./test_statusline.sh
 
-# 安裝腳本測試（22 個）
+# Installer tests (22 tests)
 ./test_installer.sh
 ```
 
-## How It Works / 運作原理
+## How It Works
 
-Claude Code 每次回覆後，會將 session 資料以 JSON 格式透過 stdin 傳給你的 statusline 腳本。腳本用 `jq` 解析欄位，以 ANSI 顏色格式化輸出，Claude Code 再將輸出顯示在終端機底部。全程在本機執行，不消耗 API tokens。
+Claude Code pipes session data as JSON to your statusline script via stdin on every response. The script parses it with `jq`, formats the output with ANSI colors, and prints it. Claude Code displays the output at the bottom of the terminal. Runs locally — no API tokens consumed.
 
-## Acknowledgments / 致謝
+## Acknowledgments
 
-本專案基於 [YAHA 學堂](https://www.youtube.com/@yaboruei) 的[教學影片](https://youtu.be/wHRFuTqlpD8?si=-iWSGmMA3w7z40V-)。影片介紹了 Claude Code statusline 腳本的概念與基礎做法。我們在此基礎上新增了 rate limits 顯示、安全安裝腳本、TDD 測試套件，並修復了 macOS 上 `seq 1 0` 的相容性 bug。
+This project is based on the tutorial by [YAHA 學堂](https://www.youtube.com/@yaboruei). Their [video](https://youtu.be/wHRFuTqlpD8?si=-iWSGmMA3w7z40V-) walks through the concepts of Claude Code statusline scripting. We built on their approach with additional features (rate limits, safe installer, TDD test suite) and fixed the `seq 1 0` macOS compatibility bug.
 
 ## License
 
