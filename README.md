@@ -76,7 +76,7 @@ v1.1.0 支援個別控制三行的顯示狀態：
 
 | 行 | 切換方式 |
 |---|---|
-| 第一行 | 透過 `/statusline` 選單，或直接修改 `~/.claude/statusline_config.json` |
+| 第一行 | 透過 `/statusline` 選單，或直接修改 `~/.claude/statusline-config.json` |
 | 第二行 | 同上 |
 | 第三行 | 同上（Rate Limit 行，Free 用戶可選擇隱藏） |
 
