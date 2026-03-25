@@ -76,7 +76,7 @@ v1.1.0 supports independent control over each line's visibility:
 
 | Line | How to toggle |
 |---|---|
-| Line 1 | Via `/statusline` menu, or edit `~/.claude/statusline_config.json` directly |
+| Line 1 | Via `/statusline` menu, or edit `~/.claude/statusline-config.json` directly |
 | Line 2 | Same as above |
 | Line 3 | Same as above (Rate Limit line — Free users may prefer to hide it) |
 
