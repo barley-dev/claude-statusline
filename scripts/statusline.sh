@@ -2,9 +2,19 @@
 input=$(cat)
 
 # ── 讀取設定 ──
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_SCRIPT="$SCRIPT_DIR/config.sh"
-if [ -x "$CONFIG_SCRIPT" ]; then
+CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
+CONFIG_SCRIPT=""
+
+# 優先：同目錄（co-located install / plugin 模式）
+_local_config="$(cd "$(dirname "$0")" && pwd)/config.sh"
+if [ -x "$_local_config" ]; then
+    CONFIG_SCRIPT="$_local_config"
+# 其次：CLAUDE_HOME（傳統安裝，config.sh 在 ~/.claude/）
+elif [ -x "$CLAUDE_HOME/statusline-config.sh" ]; then
+    CONFIG_SCRIPT="$CLAUDE_HOME/statusline-config.sh"
+fi
+
+if [ -n "$CONFIG_SCRIPT" ]; then
     show_model_git=$("$CONFIG_SCRIPT" get model_git)
     show_progress_cost=$("$CONFIG_SCRIPT" get progress_cost)
     show_rate_limits=$("$CONFIG_SCRIPT" get rate_limits)

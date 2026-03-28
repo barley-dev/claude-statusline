@@ -199,6 +199,32 @@ echo "--- Ctx 前綴 ---"
 BASIC='{"model":{"display_name":"Opus"},"cwd":"/tmp","context_window":{"used_percentage":45},"cost":{"total_cost_usd":1.50,"total_duration_ms":600000}}'
 assert_contains "Line 2 顯示 Ctx 前綴" "$BASIC" "Ctx 45%"
 
+# ── Config 路徑解析（模擬安裝後隔離狀態）──
+echo ""
+echo "--- Config 路徑解析（隔離安裝）---"
+ISOLATED_DIR="/tmp/test-config-path-$$"
+ISOLATED_HOME="$ISOLATED_DIR/claude-home"
+ISOLATED_BIN="$ISOLATED_DIR/bin"
+mkdir -p "$ISOLATED_HOME" "$ISOLATED_BIN"
+
+# 模擬安裝後狀態：statusline.sh 和 config.sh 不在同一目錄
+cp "$SCRIPT" "$ISOLATED_BIN/statusline.sh"
+chmod +x "$ISOLATED_BIN/statusline.sh"
+cp "$CONFIG_SCRIPT" "$ISOLATED_HOME/statusline-config.sh"
+chmod +x "$ISOLATED_HOME/statusline-config.sh"
+
+BASIC='{"model":{"display_name":"Opus"},"cwd":"/tmp","context_window":{"used_percentage":45},"cost":{"total_cost_usd":1.50,"total_duration_ms":600000}}'
+
+# 設定為關閉 model_git
+CLAUDE_HOME="$ISOLATED_HOME" "$ISOLATED_HOME/statusline-config.sh" set model_git false
+
+# 從隔離的 bin 目錄執行 statusline.sh（同目錄沒有 config.sh）
+output=$(echo "$BASIC" | CLAUDE_HOME="$ISOLATED_HOME" "$ISOLATED_BIN/statusline.sh" 2>/dev/null | strip_ansi)
+line_count=$(echo "$output" | wc -l | tr -d ' ')
+assert_eq "隔離安裝：CLAUDE_HOME 下的 statusline-config.sh 生效" "1" "$line_count"
+
+rm -rf "$ISOLATED_DIR"
+
 # ── 行數開關 ──
 echo ""
 echo "--- 行數開關 ---"
