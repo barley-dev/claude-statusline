@@ -11,10 +11,14 @@
 
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.0"
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 SETTINGS_FILE="$CLAUDE_HOME/settings.json"
 STATUSLINE_FILE="$CLAUDE_HOME/statusline.sh"
+CONFIG_FILE="$CLAUDE_HOME/statusline-config.sh"
+COMMAND_DIR="$CLAUDE_HOME/commands"
+COMMAND_FILE="$COMMAND_DIR/statusline.md"
 AUTO_YES=false
 
 [[ "${1:-}" == "--yes" ]] && AUTO_YES=true
@@ -48,128 +52,20 @@ echo "Claude Code Statusline Installer v$VERSION"
 echo "==========================================="
 echo ""
 
-# ── 寫入 statusline.sh ──
-cat > "$STATUSLINE_FILE" << 'STATUSLINE_SCRIPT'
-#!/bin/bash
-input=$(cat)
-
-model=$(echo "$input" | jq -r '.model.display_name // "?"')
-cwd=$(echo "$input" | jq -r '.cwd // ""')
-percentage=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-duration_ms=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | cut -d. -f1)
-
-directory="${cwd##*/}"
-
-# 百分比安全範圍
-[ "$percentage" -lt 0 ] 2>/dev/null && percentage=0
-[ "$percentage" -gt 100 ] 2>/dev/null && percentage=100
-
-# ANSI 顏色
-RED='\033[31m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-DIM='\033[2m'
-RESET='\033[0m'
-
-# ── Git 資訊 ──
-git_info=""
-if [ -n "$cwd" ] && git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
-    staged=$(git -C "$cwd" diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
-    modified=$(git -C "$cwd" diff --numstat 2>/dev/null | wc -l | tr -d ' ')
-
-    git_info=" ($branch"
-    [ "$staged" -gt 0 ] 2>/dev/null && git_info+=" ${GREEN}+${staged}${RESET}"
-    [ "$modified" -gt 0 ] 2>/dev/null && git_info+=" ${YELLOW}~${modified}${RESET}"
-    git_info+=")"
-fi
-
-# ── 進度條顏色 ──
-if [ "$percentage" -ge 90 ] 2>/dev/null; then
-    bar_color="$RED"
-elif [ "$percentage" -ge 70 ] 2>/dev/null; then
-    bar_color="$YELLOW"
-else
-    bar_color="$GREEN"
-fi
-
-# ── 進度條（10 格）──
-filled=$((percentage / 10))
-empty=$((10 - filled))
-bar="${bar_color}"
-[ "$filled" -gt 0 ] && bar+="$(printf '█%.0s' $(seq 1 $filled))"
-[ "$empty" -gt 0 ] && bar+="$(printf '░%.0s' $(seq 1 $empty))"
-bar+="${RESET}"
-
-# ── 時間轉換 ──
-total_sec=$((duration_ms / 1000))
-minutes=$((total_sec / 60))
-seconds=$((total_sec % 60))
-time_str="${minutes}m${seconds}s"
-
-# ── 費用格式化 ──
-cost_str=$(printf '$%.2f' "$cost")
-
-# ── 第一行：模型 + 資料夾 + Git ──
-echo -e "[$model] $directory$git_info"
-
-# ── 第二行：進度條 + 費用 + 時間 ──
-echo -e "$bar ${bar_color}${percentage}%${RESET} │ ${DIM}${cost_str} · ${time_str}${RESET}"
-
-# ── 第三行：Rate Limits（僅 Pro/Max 用戶）──
-five_hour_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
-seven_day_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
-
-if [ -n "$five_hour_pct" ] && [ -n "$seven_day_pct" ]; then
-    five_hour_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // 0' | cut -d. -f1)
-    seven_day_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // 0' | cut -d. -f1)
-    now=$(date +%s)
-
-    # 5h 倒數
-    five_diff=$(( five_hour_reset - now ))
-    if [ "$five_diff" -le 0 ] 2>/dev/null; then
-        five_str="now"
-    else
-        five_h=$(( five_diff / 3600 ))
-        five_m=$(( (five_diff % 3600) / 60 ))
-        five_str="${five_h}h ${five_m}m"
-    fi
-
-    # 7d 倒數
-    seven_diff=$(( seven_day_reset - now ))
-    if [ "$seven_diff" -le 0 ] 2>/dev/null; then
-        seven_str="now"
-    else
-        seven_d=$(( seven_diff / 86400 ))
-        seven_h=$(( (seven_diff % 86400) / 3600 ))
-        seven_str="${seven_d}d ${seven_h}h"
-    fi
-
-    # 5h 顏色
-    if [ "$five_hour_pct" -ge 90 ] 2>/dev/null; then
-        five_color="$RED"
-    elif [ "$five_hour_pct" -ge 70 ] 2>/dev/null; then
-        five_color="$YELLOW"
-    else
-        five_color="$GREEN"
-    fi
-
-    # 7d 顏色
-    if [ "$seven_day_pct" -ge 90 ] 2>/dev/null; then
-        seven_color="$RED"
-    elif [ "$seven_day_pct" -ge 70 ] 2>/dev/null; then
-        seven_color="$YELLOW"
-    else
-        seven_color="$GREEN"
-    fi
-
-    echo -e "${five_color}5h: ${five_hour_pct}%${RESET} ${DIM}(reset ${five_str})${RESET} │ ${seven_color}7d: ${seven_day_pct}%${RESET} ${DIM}(reset ${seven_str})${RESET}"
-fi
-STATUSLINE_SCRIPT
-
+# ── 複製 statusline.sh（v1.1+，含 Ctx 前綴與 config 切換）──
+cp "$PROJECT_DIR/scripts/statusline.sh" "$STATUSLINE_FILE"
 chmod +x "$STATUSLINE_FILE"
 info "statusline.sh 已安裝到 $STATUSLINE_FILE"
+
+# ── 複製 config.sh ──
+cp "$PROJECT_DIR/scripts/config.sh" "$CONFIG_FILE"
+chmod +x "$CONFIG_FILE"
+info "statusline-config.sh 已安裝到 $CONFIG_FILE"
+
+# ── 複製 /statusline 指令 ──
+mkdir -p "$COMMAND_DIR"
+cp "$PROJECT_DIR/commands/statusline.md" "$COMMAND_FILE"
+info "/statusline 指令已安裝到 $COMMAND_FILE"
 
 # ── 合併 settings.json ──
 STATUSLINE_CONFIG='{"statusLine":{"type":"command","command":"~/.claude/statusline.sh"}}'
