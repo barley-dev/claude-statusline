@@ -9,10 +9,10 @@ You are managing the Claude Code Statusline configuration. Follow these instruct
 Run this command to read the current configuration:
 
 ```bash
-CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}" && bash "$CLAUDE_HOME/claude-statusline/scripts/config.sh" read 2>/dev/null || echo '{"lines":{"model_git":true,"progress_cost":true,"rate_limits":true}}'
+bash "$HOME/.claude/statusline-config.sh" read 2>/dev/null || echo '{"lines":{"model_git":true,"progress_cost":true,"rate_limits":true}}'
 ```
 
-If the command fails or config.sh is not found, use the default: all three lines enabled.
+If the command fails or statusline-config.sh is not found, use the default: all three lines enabled.
 
 Parse the JSON output to determine which lines are currently enabled (`true` or `false` for each key: `model_git`, `progress_cost`, `rate_limits`).
 
@@ -74,13 +74,13 @@ When user selects 1, 2, or 3, run the corresponding toggle command. Toggle means
 
 ```bash
 # For option 1 (model_git):
-bash "$HOME/.claude/claude-statusline/scripts/config.sh" set model_git [true|false]
+bash "$HOME/.claude/statusline-config.sh" set model_git [true|false]
 
 # For option 2 (progress_cost):
-bash "$HOME/.claude/claude-statusline/scripts/config.sh" set progress_cost [true|false]
+bash "$HOME/.claude/statusline-config.sh" set progress_cost [true|false]
 
 # For option 3 (rate_limits):
-bash "$HOME/.claude/claude-statusline/scripts/config.sh" set rate_limits [true|false]
+bash "$HOME/.claude/statusline-config.sh" set rate_limits [true|false]
 ```
 
 After toggling, show confirmation and updated status:
@@ -99,7 +99,7 @@ Then show the Display Settings menu again for further changes. If user selects 4
 Run a preview using sample data:
 
 ```bash
-echo '{"model":{"display_name":"Opus 4.6 (1M)"},"cwd":"'"$(pwd)"'","context_window":{"used_percentage":45},"cost":{"total_cost_usd":1.50,"total_duration_ms":600000}}' | bash "$HOME/.claude/claude-statusline/scripts/statusline.sh"
+echo '{"model":{"display_name":"Opus 4.6 (1M)"},"cwd":"'"$(pwd)"'","context_window":{"used_percentage":45},"cost":{"total_cost_usd":1.50,"total_duration_ms":600000}}' | bash "$HOME/.claude/statusline.sh"
 ```
 
 Show the output to the user with a brief note:
@@ -120,7 +120,7 @@ Then return to the main menu (Step 2).
 Run:
 
 ```bash
-bash "$HOME/.claude/claude-statusline/scripts/config.sh" reset
+bash "$HOME/.claude/statusline-config.sh" reset
 ```
 
 Show:
@@ -136,6 +136,6 @@ Then return to the main menu (Step 2).
 
 - Always present menus in BOTH Chinese AND English as shown above
 - Always STOP and wait for user input after presenting a menu
-- If config.sh is not found, tell the user: "找不到 config.sh，請確認 plugin 已正確安裝。/ config.sh not found, please verify the plugin is installed correctly."
+- If statusline-config.sh is not found, tell the user: "找不到 statusline-config.sh，請重新執行 install.sh。/ statusline-config.sh not found, please re-run install.sh."
 - After any config change, remind the user: "變更會在下次 Claude 回覆後生效。/ Changes take effect after the next Claude response."
-- Use `$HOME/.claude/claude-statusline/scripts/config.sh` as the full path for all config operations
+- Use `$HOME/.claude/statusline-config.sh` as the full path for all config operations
