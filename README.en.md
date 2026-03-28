@@ -1,6 +1,6 @@
 # Claude Code Statusline
 
-**v1.1.0** · A colorful, informative status bar for Claude Code — context usage, cost tracking, Git status, and rate limits at a glance.
+**v1.2.0** · A colorful, informative status bar for Claude Code — context usage, cost tracking, Git status, and rate limits at a glance.
 
 [繁體中文](README.md)
 
@@ -22,15 +22,6 @@ Inspired by [YAHA 學堂](https://www.youtube.com/@yaboruei)'s video: [Claude Co
 
 ## Installation
 
-### Plugin Install (Recommended)
-
-```bash
-# Run inside Claude Code
-/plugin marketplace add barley-dev/claude-statusline
-```
-
-### Traditional Install
-
 ```bash
 git clone https://github.com/barley-dev/claude-statusline.git
 cd claude-statusline
@@ -42,8 +33,10 @@ Restart Claude Code and the statusline appears at the bottom.
 ## What the Installer Does
 
 1. Checks that `jq` is installed (required dependency)
-2. Writes `statusline.sh` to `~/.claude/statusline.sh`
-3. Safely merges `statusLine` config into `~/.claude/settings.json`
+2. Writes `statusline.sh` (v1.1+, with Ctx prefix and per-line toggle) to `~/.claude/statusline.sh`
+3. Writes `statusline-config.sh` to `~/.claude/statusline-config.sh` (per-line toggle manager)
+4. Writes `/statusline` command to `~/.claude/commands/statusline.md`
+5. Safely merges `statusLine` config into `~/.claude/settings.json`
    - Creates backup (`settings.json.bak`) before modifying
    - Won't overwrite existing config — only adds/updates `statusLine`
    - Asks before replacing an existing statusline setup
@@ -107,9 +100,9 @@ Removes `statusline.sh` and the `statusLine` key from `settings.json`. All other
 | Rate limits | 5-hour and 7-day usage with countdown to reset |
 | Adaptive | Works with any model / context window size (200K / 1M) |
 | Safe install | Backs up settings, validates JSON, never overwrites blindly |
-| Plugin install | One-command install via `/plugin marketplace` (v1.1.0) |
-| Interactive config | `/statusline` conversational menu for configuration (v1.1.0) |
-| Per-line toggle | Independently show/hide each of the 3 lines (v1.1.0) |
+| Interactive config | `/statusline` conversational menu for configuration (v1.1.0+) |
+| Per-line toggle | Independently show/hide each of the 3 lines (v1.1.0+) |
+| Architecture fix | Compatible with Claude Code 2.1.x plugin system (v1.2.0) |
 
 ## Running Tests
 
@@ -133,9 +126,9 @@ This project is based on the tutorial by [YAHA 學堂](https://www.youtube.com/@
 - Safe install/uninstall scripts (backup, JSON validation, merge without overwrite)
 - Full TDD test suite (55 tests)
 - Fixed macOS `seq 1 0` bug causing incorrect progress bar at 0% and 100%
-- Plugin format installation support (v1.1.0)
 - `/statusline` interactive configuration menu (v1.1.0)
 - Per-line visibility toggle (v1.1.0)
+- Architecture fix for Claude Code 2.1.x compatibility (v1.2.0)
 
 ## License
 
