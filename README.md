@@ -1,6 +1,6 @@
 # Claude Code Statusline
 
-**v1.1.0** · Claude Code 彩色狀態列——context 用量、費用追蹤、Git 狀態、rate limits，一眼看完。
+**v1.2.0** · Claude Code 彩色狀態列——context 用量、費用追蹤、Git 狀態、rate limits，一眼看完。
 
 [English](README.en.md)
 
@@ -22,15 +22,6 @@
 
 ## 安裝方式
 
-### Plugin 安裝（推薦）
-
-```bash
-# 在 Claude Code 中執行
-/plugin marketplace add barley-dev/claude-statusline
-```
-
-### 傳統安裝
-
 ```bash
 git clone https://github.com/barley-dev/claude-statusline.git
 cd claude-statusline
@@ -42,8 +33,10 @@ cd claude-statusline
 ## 安裝腳本做了什麼
 
 1. 檢查 `jq` 是否已安裝（必要依賴）
-2. 將 `statusline.sh` 寫入 `~/.claude/statusline.sh`
-3. **安全合併** `statusLine` 設定到 `~/.claude/settings.json`
+2. 將 `statusline.sh`（v1.1+，含 Ctx 前綴與行數切換）寫入 `~/.claude/statusline.sh`
+3. 將 `statusline-config.sh` 寫入 `~/.claude/statusline-config.sh`（每行切換管理）
+4. 將 `/statusline` 指令寫入 `~/.claude/commands/statusline.md`
+5. **安全合併** `statusLine` 設定到 `~/.claude/settings.json`
    - 修改前自動備份（`settings.json.bak`）
    - 不覆蓋其他設定——只新增/更新 `statusLine`
    - 已有 statusLine 設定時會詢問是否覆蓋
@@ -107,9 +100,9 @@ v1.1.0 支援個別控制三行的顯示狀態：
 | Rate Limits | 5 小時 / 7 天用量，含重置倒數計時 |
 | 自動適應 | 適用任何模型與 context window 大小（200K / 1M 都行） |
 | 安全安裝 | 備份設定、驗證 JSON、不盲目覆蓋 |
-| Plugin 安裝 | 支援 `/plugin marketplace` 一鍵安裝（v1.1.0） |
-| 互動設定 | `/statusline` 指令開啟對話式設定選單（v1.1.0） |
-| 每行切換 | 獨立控制三行的顯示/隱藏（v1.1.0） |
+| 互動設定 | `/statusline` 指令開啟對話式設定選單（v1.1.0+） |
+| 每行切換 | 獨立控制三行的顯示/隱藏（v1.1.0+） |
+| 架構修復 | 相容 Claude Code 2.1.x plugin 系統（v1.2.0） |
 
 ## 執行測試
 
@@ -135,9 +128,9 @@ Claude Code 每次回覆完畢後，會將 session 資料以 JSON 格式透過 s
 - 安全安裝/反安裝腳本（備份、JSON 驗證、合併不覆蓋）
 - 完整 TDD 測試套件（55 個測試）
 - 修復 macOS `seq 1 0` 導致進度條在 0% 和 100% 顯示錯誤的 bug
-- Plugin 格式安裝支援（v1.1.0）
 - `/statusline` 互動式設定選單（v1.1.0）
 - 每行獨立切換顯示功能（v1.1.0）
+- 架構修復：相容 Claude Code 2.1.x（v1.2.0）
 
 ## 授權
 
