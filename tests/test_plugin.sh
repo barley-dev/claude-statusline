@@ -43,8 +43,9 @@ assert_true "settings.json 是合法 JSON" \
 assert_eq "statusLine type" \
     "command" \
     "$(jq -r '.statusLine.type' "$PROJECT_DIR/settings.json")"
-assert_true "statusLine command 包含 CLAUDE_PLUGIN_ROOT" \
-    "jq -r '.statusLine.command' '$PROJECT_DIR/settings.json' | grep -q 'CLAUDE_PLUGIN_ROOT'"
+assert_eq "statusLine command 指向 ~/.claude/statusline.sh" \
+    "~/.claude/statusline.sh" \
+    "$(jq -r '.statusLine.command' "$PROJECT_DIR/settings.json")"
 
 echo "--- 目錄結構 ---"
 assert_true "commands/ 目錄存在" \
