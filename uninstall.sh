@@ -11,6 +11,9 @@ set -euo pipefail
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 SETTINGS_FILE="$CLAUDE_HOME/settings.json"
 STATUSLINE_FILE="$CLAUDE_HOME/statusline.sh"
+CONFIG_SCRIPT="$CLAUDE_HOME/statusline-config.sh"
+CONFIG_JSON="$CLAUDE_HOME/statusline-config.json"
+COMMAND_FILE="$CLAUDE_HOME/commands/statusline.md"
 AUTO_YES=false
 
 [[ "${1:-}" == "--yes" ]] && AUTO_YES=true
@@ -39,6 +42,24 @@ if [ -f "$STATUSLINE_FILE" ]; then
     info "已刪除 $STATUSLINE_FILE"
 else
     warn "statusline.sh 不存在，跳過"
+fi
+
+# ── 刪除 statusline-config.sh ──
+if [ -f "$CONFIG_SCRIPT" ]; then
+    rm "$CONFIG_SCRIPT"
+    info "已刪除 $CONFIG_SCRIPT"
+fi
+
+# ── 刪除 statusline-config.json ──
+if [ -f "$CONFIG_JSON" ]; then
+    rm "$CONFIG_JSON"
+    info "已刪除 $CONFIG_JSON"
+fi
+
+# ── 刪除 /statusline 指令 ──
+if [ -f "$COMMAND_FILE" ]; then
+    rm "$COMMAND_FILE"
+    info "已刪除 $COMMAND_FILE"
 fi
 
 # ── 從 settings.json 移除 statusLine ──
